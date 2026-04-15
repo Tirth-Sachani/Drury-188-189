@@ -92,6 +92,4 @@ body {
 
 .sidebar-link {
   display: block;
-  transform: translateY(100%);
-  opacity: 0;
 }
