@@ -51,24 +51,60 @@ export default function NapkinArtPage() {
       wrappers.forEach((wrapper, i) => {
         const card = wrapper.querySelector(".napkin-card") as HTMLElement;
         const desc = wrapper.querySelector(".napkin-desc") as HTMLElement;
-        const initialRotation = Number(wrapper.dataset.rotate) || 0;
+        const floatContainer = wrapper.querySelector(".float-container") as HTMLElement;
 
-        // 4. Organic "Water Wave" Floating Animation
-        const waveY = 15 + Math.random() * 20;
-        const waveX = 5 + Math.random() * 10;
-        const waveRot = 1.5 + Math.random() * 2;
-        const waveDuration = 4 + Math.random() * 2;
+        // 4. Advanced Realistic Water Wave Simulation (GSAP)
+        if (floatContainer) {
+          const depth = Math.random(); // Distance mapping
+          const depthMod = 1 + (depth * 0.6); // Further = slower
+          
+          const maxX = 18 + Math.random() * 12; // 18 to 30px drifting bounds
+          const maxY = 25 + Math.random() * 15; // 25 to 40px bounding box
 
-        const waveTween = gsap.to(card, {
-          y: `-=${waveY}`,
-          x: `+=${waveX}`,
-          rotation: initialRotation + (i % 2 === 0 ? waveRot : -waveRot),
-          duration: waveDuration,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-          delay: Math.random() * 2,
-        });
+          // Start at randomized organic offset and scale based on perceived depth
+          gsap.set(floatContainer, {
+            x: gsap.utils.random(-maxX, maxX),
+            y: gsap.utils.random(-maxY, maxY),
+            rotation: gsap.utils.random(-2, 2),
+            scale: 0.94 + (1 - depth) * 0.06, // Depth scaling effect
+            opacity: 0.88 + (1 - depth) * 0.12, // Depth atmospheric effect
+          });
+
+          // Horizontal drift (Ocean Current) -> Generates smooth sweeping arcs
+          const animateX = () => {
+             gsap.to(floatContainer, {
+               x: gsap.utils.random(-maxX, maxX),
+               duration: gsap.utils.random(8, 14) * depthMod,
+               ease: "sine.inOut",
+               onComplete: animateX
+             });
+          };
+
+          // Vertical swell (Wave heights)
+          const animateY = () => {
+             gsap.to(floatContainer, {
+               y: gsap.utils.random(-maxY, maxY),
+               duration: gsap.utils.random(6, 12) * depthMod,
+               ease: "sine.inOut",
+               onComplete: animateY
+             });
+          };
+
+          // Floating object tilting
+          const animateRot = () => {
+             gsap.to(floatContainer, {
+               rotation: gsap.utils.random(-3, 3),
+               duration: gsap.utils.random(10, 16) * depthMod,
+               ease: "sine.inOut",
+               onComplete: animateRot
+             });
+          };
+
+          // Trigger continuous fluid movement
+          animateX();
+          animateY();
+          animateRot();
+        }
 
         // 5. Hover Interactions (Magnetic Tilt + Details Reveal)
         if (card) {
@@ -80,14 +116,14 @@ export default function NapkinArtPage() {
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
             
-            const rotateX = (y - centerY) / 8;
-            const rotateY = (centerX - x) / 8;
+            const rotateX = (y - centerY) / 12; // Minimal, premium tilt
+            const rotateY = (centerX - x) / 12;
             
             gsap.to(card, {
               rotateX: rotateX,
               rotateY: rotateY,
-              x: (x - centerX) / 10,
-              y: (y - centerY) / 10,
+              x: (x - centerX) / 15,
+              y: (y - centerY) / 15,
               duration: 0.4,
               ease: "power2.out",
               transformPerspective: 1200
@@ -95,20 +131,19 @@ export default function NapkinArtPage() {
           });
 
           card.addEventListener("mouseenter", () => {
-            waveTween.pause();
             gsap.to(wrapper, { zIndex: 100, duration: 0.1 });
             gsap.to(card, { 
-              scale: 1.15, 
-              boxShadow: "0 40px 80px rgba(28, 18, 8, 0.25)",
-              borderColor: "rgba(200, 146, 74, 0.3)", // subtle crema border
-              duration: 0.8, 
-              ease: "expo.out" 
+              scale: 1.05, // Slower, minimal scale, NO elastic bounce
+              boxShadow: "0 30px 60px rgba(28, 18, 8, 0.2)",
+              borderColor: "rgba(200, 146, 74, 0.3)", 
+              duration: 0.6, 
+              ease: "sine.out" 
             });
             if (desc) {
               gsap.to(desc, { 
                 height: "auto", 
                 opacity: 1, 
-                marginTop: 20, 
+                marginTop: 16, 
                 duration: 0.5, 
                 ease: "power3.out" 
               });
@@ -116,7 +151,6 @@ export default function NapkinArtPage() {
           });
 
           card.addEventListener("mouseleave", () => {
-            waveTween.play();
             gsap.to(wrapper, { zIndex: 1, duration: 0.5 });
             gsap.to(card, { 
               scale: 1, 
@@ -126,8 +160,8 @@ export default function NapkinArtPage() {
               y: 0,
               borderColor: "transparent",
               boxShadow: "0 20px 40px rgba(28, 18, 8, 0.1)",
-              duration: 1.2, 
-              ease: "elastic.out(1, 0.3)" 
+              duration: 0.8, 
+              ease: "power2.out" // Replaced elastic bounce with smooth premium ease
             });
             if (desc) {
               gsap.to(desc, { height: 0, opacity: 0, marginTop: 0, duration: 0.4 });
@@ -213,42 +247,44 @@ export default function NapkinArtPage() {
               className={`napkin-wrapper w-full flex justify-center ${napkin.offset || ""}`} 
               data-rotate={napkin.rotate || 0}
             >
-              <div 
-                className="napkin-card group/card bg-[#FDFCFB] p-5 shadow-2xl shadow-roast/10 relative cursor-none"
-                style={{ transform: `rotate(${napkin.rotate || 0}deg)` }}
-              >
-                {/* Vintage paper texture overlay */}
-                <div className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-multiply bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
-                
-                {/* Napkin image with hover scaling wrapper */}
-                <div className="w-full aspect-square overflow-hidden rounded-sm relative z-0">
-                  <div 
-                    className="w-full h-full bg-cover bg-center grayscale-50 group-hover/card:grayscale-0 group-hover/card:scale-110 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] origin-center will-change-transform"
-                    style={{ backgroundImage: `url('${napkin.image}')` }}
-                  ></div>
-                </div>
-                
-                {/* Details */}
-                <div className="mt-5 flex justify-between items-end border-t border-dashed border-roast/20 pt-4">
-                  <div>
-                    <span className="serif italic text-[14px] text-roast block mb-1">{napkin.artist}</span>
-                    <span className="monolith text-[8px] opacity-40 uppercase tracking-widest">{napkin.type}</span>
+              <div className="float-container w-full flex justify-center will-change-transform">
+                <div 
+                  className="napkin-card group/card bg-[#FDFCFB] p-5 shadow-[0_20px_40px_rgba(28,18,8,0.1)] relative cursor-none border border-transparent will-change-transform"
+                  style={{ transform: `rotate(${napkin.rotate || 0}deg)` }}
+                >
+                  {/* Vintage paper texture overlay */}
+                  <div className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-multiply bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+                  
+                  {/* Napkin image with hover scaling wrapper */}
+                  <div className="w-full aspect-square overflow-hidden rounded-sm relative z-0">
+                    <div 
+                      className="w-full h-full bg-cover bg-center grayscale-50 group-hover/card:grayscale-0 group-hover/card:scale-110 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] origin-center will-change-transform"
+                      style={{ backgroundImage: `url('${napkin.image}')` }}
+                    ></div>
                   </div>
-                  <div className="text-right">
-                    <span className="monolith text-[8px] opacity-30 tracking-[0.2em]">Napkin</span>
-                    <span className="monolith text-xs block tracking-widest">#{napkin.id}</span>
+                  
+                  {/* Details */}
+                  <div className="mt-5 flex justify-between items-end border-t border-dashed border-roast/20 pt-4">
+                    <div>
+                      <span className="serif italic text-[14px] text-roast block mb-1">{napkin.artist}</span>
+                      <span className="monolith text-[8px] opacity-40 uppercase tracking-widest">{napkin.type}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="monolith text-[8px] opacity-30 tracking-[0.2em]">Napkin</span>
+                      <span className="monolith text-xs block tracking-widest">#{napkin.id}</span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Hidden Description (Reveals on hover) */}
-                <div className="napkin-desc h-0 overflow-hidden opacity-0">
-                  <p className="monolith text-[9px] leading-relaxed text-roast/60 pt-2 border-t border-roast/10 border-dashed">
-                    {napkin.desc}
-                  </p>
+                  {/* Hidden Description (Reveals on hover) */}
+                  <div className="napkin-desc h-0 overflow-hidden opacity-0">
+                    <p className="monolith text-[9px] leading-relaxed text-roast/60 pt-2 border-t border-roast/10 border-dashed">
+                      {napkin.desc}
+                    </p>
+                  </div>
+                  
+                  {/* Realistic edge shading */}
+                  <div className="absolute top-0 right-0 w-full h-full pointer-events-none shadow-[inset_0px_0px_15px_rgba(0,0,0,0.03)] rounded-sm"></div>
                 </div>
-                
-                {/* Realistic edge shading */}
-                <div className="absolute top-0 right-0 w-full h-full pointer-events-none shadow-[inset_0px_0px_15px_rgba(0,0,0,0.03)] rounded-sm"></div>
               </div>
             </div>
           ))}
