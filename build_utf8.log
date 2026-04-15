@@ -1,0 +1,351 @@
+﻿
+> drury-web@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.7 (Turbopack)
+
+  Creating an optimized production build ...
+node.exe : 
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~
+    + CategoryInfo          : Not 
+   Specified: (:String) [], Remo  
+  teException
+    + FullyQualifiedErrorId : Nat 
+   iveCommandError
+ 
+> Build error occurred
+Error: Turbopack build failed 
+with 6 errors:
+./node_modules/@tailwindcss/node/n
+ode_modules/lightningcss/node/inde
+x.js
+non-ecmascript placeable asset
+asset is not placeable in ESM 
+chunks, so it doesn't have a 
+module id
+
+Import trace:
+  postcss:
+    ./node_modules/@tailwindcss/no
+de/node_modules/lightningcss/node/
+index.js
+    ./node_modules/@tailwindcss/no
+de/node_modules/lightningcss/node/
+index.mjs
+    ./node_modules/@tailwindcss/no
+de/dist/index.mjs
+    ./node_modules/@tailwindcss/po
+stcss/dist/index.mjs
+    ./postcss.config.mjs
+
+
+./node_modules/@tailwindcss/oxide/
+index.js
+non-ecmascript placeable asset
+asset is not placeable in ESM 
+chunks, so it doesn't have a 
+module id
+
+Import trace:
+  postcss:
+    ./node_modules/@tailwindcss/ox
+ide/index.js
+    ./node_modules/@tailwindcss/po
+stcss/dist/index.mjs
+    ./postcss.config.mjs
+
+
+./app/admin/admin.css
+Error evaluating Node.js code
+Error: Cannot find module 
+'unknown'
+    at node_modules/@tailwindcss/n
+ode/node_modules/lightningcss/node
+/index.js:22:19 [E:\DRURY-188-189\
+.next\build\chunks\node_modules_7e
+c7e53e._.js:7179:23]
+    at module evaluation (node_mod
+ules/@tailwindcss/node/node_module
+s/lightningcss/node/index.js:22:19
+) [E:\DRURY-188-189\.next\build\ch
+unks\node_modules_7ec7e53e._.js:71
+82:11]
+    at instantiateModule (turbopac
+k:///[turbopack]/nodejs/runtime.ts
+:226:5) [E:\DRURY-188-189\.next\bu
+ild\chunks\[turbopack]_runtime.js:
+740:9]
+    at 
+getOrInstantiateModuleFromParent (
+turbopack:///[turbopack]/nodejs/ru
+ntime.ts:259:10) [E:\DRURY-188-189
+\.next\build\chunks\[turbopack]_ru
+ntime.js:763:12]
+    at Context.esmImport [as i] (t
+urbopack:///[turbopack]/shared/run
+time-utils.ts:347:18) [E:\DRURY-18
+8-189\.next\build\chunks\[turbopac
+k]_runtime.js:228:20]
+    at module evaluation (node_mod
+ules/@tailwindcss/node/node_module
+s/lightningcss/node/index.mjs:1:1)
+ [E:\DRURY-188-189\.next\build\chu
+nks\node_modules_7ec7e53e._.js:720
+8:209]
+    at instantiateModule (turbopac
+k:///[turbopack]/nodejs/runtime.ts
+:226:5) [E:\DRURY-188-189\.next\bu
+ild\chunks\[turbopack]_runtime.js:
+740:9]
+    at 
+getOrInstantiateModuleFromParent (
+turbopack:///[turbopack]/nodejs/ru
+ntime.ts:259:10) [E:\DRURY-188-189
+\.next\build\chunks\[turbopack]_ru
+ntime.js:763:12]
+    at Context.esmImport [as i] (t
+urbopack:///[turbopack]/shared/run
+time-utils.ts:347:18) [E:\DRURY-18
+8-189\.next\build\chunks\[turbopac
+k]_runtime.js:228:20]
+    at module evaluation (node_mod
+ules/@tailwindcss/node/dist/index.
+mjs:15:181) [E:\DRURY-188-189\.nex
+t\build\chunks\node_modules_7ec7e5
+3e._.js:8587:210]
+
+Import trace:
+  Client Component Browser:
+    ./app/admin/admin.css [Client 
+Component Browser]
+    ./app/admin/layout.tsx 
+[Client Component Browser]
+    ./app/admin/layout.tsx 
+[Server Component]
+
+
+./app/globals.css
+Error evaluating Node.js code
+Error: Cannot find module 
+'unknown'
+    at node_modules/@tailwindcss/n
+ode/node_modules/lightningcss/node
+/index.js:22:19 [E:\DRURY-188-189\
+.next\build\chunks\node_modules_7e
+c7e53e._.js:7179:23]
+    at module evaluation (node_mod
+ules/@tailwindcss/node/node_module
+s/lightningcss/node/index.js:22:19
+) [E:\DRURY-188-189\.next\build\ch
+unks\node_modules_7ec7e53e._.js:71
+82:11]
+    at instantiateModule (turbopac
+k:///[turbopack]/nodejs/runtime.ts
+:226:5) [E:\DRURY-188-189\.next\bu
+ild\chunks\[turbopack]_runtime.js:
+740:9]
+    at 
+getOrInstantiateModuleFromParent (
+turbopack:///[turbopack]/nodejs/ru
+ntime.ts:259:10) [E:\DRURY-188-189
+\.next\build\chunks\[turbopack]_ru
+ntime.js:763:12]
+    at Context.esmImport [as i] (t
+urbopack:///[turbopack]/shared/run
+time-utils.ts:347:18) [E:\DRURY-18
+8-189\.next\build\chunks\[turbopac
+k]_runtime.js:228:20]
+    at module evaluation (node_mod
+ules/@tailwindcss/node/node_module
+s/lightningcss/node/index.mjs:1:1)
+ [E:\DRURY-188-189\.next\build\chu
+nks\node_modules_7ec7e53e._.js:720
+8:209]
+    at instantiateModule (turbopac
+k:///[turbopack]/nodejs/runtime.ts
+:226:5) [E:\DRURY-188-189\.next\bu
+ild\chunks\[turbopack]_runtime.js:
+740:9]
+    at 
+getOrInstantiateModuleFromParent (
+turbopack:///[turbopack]/nodejs/ru
+ntime.ts:259:10) [E:\DRURY-188-189
+\.next\build\chunks\[turbopack]_ru
+ntime.js:763:12]
+    at Context.esmImport [as i] (t
+urbopack:///[turbopack]/shared/run
+time-utils.ts:347:18) [E:\DRURY-18
+8-189\.next\build\chunks\[turbopac
+k]_runtime.js:228:20]
+    at module evaluation (node_mod
+ules/@tailwindcss/node/dist/index.
+mjs:15:181) [E:\DRURY-188-189\.nex
+t\build\chunks\node_modules_7ec7e5
+3e._.js:8587:210]
+
+Import trace:
+  Client Component Browser:
+    ./app/globals.css [Client 
+Component Browser]
+    ./app/layout.tsx [Server 
+Component]
+
+
+./node_modules/@tailwindcss/node/n
+ode_modules/lightningcss/node/inde
+x.js:22:22
+Module not found: Can't resolve 
+'../lightningcss.' <dynamic> 
+'.node'
+[0m [90m 20 |[39m     
+module[33m.[39mexports 
+[33m=[39m require([32m`lightnin
+gcss-${parts.join('-')}`[39m)[33
+m;[39m
+ [90m 21 |[39m   } 
+[36mcatch[39m (err) {
+[31m[1m>[22m[39m[90m 22 
+|[39m     
+module[33m.[39mexports 
+[33m=[39m require([32m`../light
+ningcss.${parts.join('-')}.node`[
+39m)[33m;[39m
+ [90m    |[39m                  
+    [31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m
+ [90m 23 |[39m   }
+ [90m 24 |[39m }
+ [90m 25 |[39m[0m
+
+
+
+Import trace:
+  postcss:
+    ./node_modules/@tailwindcss/no
+de/node_modules/lightningcss/node/
+index.js
+    ./node_modules/@tailwindcss/no
+de/node_modules/lightningcss/node/
+index.mjs
+    ./node_modules/@tailwindcss/no
+de/dist/index.mjs
+    ./node_modules/@tailwindcss/po
+stcss/dist/index.mjs
+    ./postcss.config.mjs
+
+https://nextjs.org/docs/messages/m
+odule-not-found
+
+
+./node_modules/@tailwindcss/node/n
+ode_modules/lightningcss/node/inde
+x.js:17:20
+Module not found: Can't resolve 
+'../pkg'
+[0m [90m 15 |[39m
+ [90m 16 |[39m [36mif[39m (pro
+cess[33m.[39menv[33m.[39m[33m
+CSS_TRANSFORMER_WASM[39m) {
+[31m[1m>[22m[39m[90m 17 
+|[39m   module[33m.[39mexports 
+[33m=[39m require([32m`../pkg`
+[39m)[33m;[39m
+ [90m    |[39m                  
+  [31m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[3
+9m
+ [90m 18 |[39m } [36melse[39m 
+{
+ [90m 19 |[39m   [36mtry[39m {
+ [90m 20 |[39m     
+module[33m.[39mexports 
+[33m=[39m require([32m`lightnin
+gcss-${parts.join('-')}`[39m)[33
+m;[39m[0m
+
+
+
+Import trace:
+  postcss:
+    ./node_modules/@tailwindcss/no
+de/node_modules/lightningcss/node/
+index.js
+    ./node_modules/@tailwindcss/no
+de/node_modules/lightningcss/node/
+index.mjs
+    ./node_modules/@tailwindcss/no
+de/dist/index.mjs
+    ./node_modules/@tailwindcss/po
+stcss/dist/index.mjs
+    ./postcss.config.mjs
+
+https://nextjs.org/docs/messages/m
+odule-not-found
+
+
+    at instantiateModule (turbopac
+k:///[turbopack]/nodejs/runtime.ts
+:226:5) [E:\DRURY-188-189\.next\bu
+ild\chunks\[turbopack]_runtime.js:
+740:9])
+    at 
+getOrInstantiateModuleFromParent (
+turbopack:///[turbopack]/nodejs/ru
+ntime.ts:259:10) [E:\DRURY-188-189
+\.next\build\chunks\[turbopack]_ru
+ntime.js:763:12])
+    at Context.esmImport [as i] (t
+urbopack:///[turbopack]/shared/run
+time-utils.ts:347:18) [E:\DRURY-18
+8-189\.next\build\chunks\[turbopac
+k]_runtime.js:228:20])
+    ... collapsed 9 duplicate 
+lines matching above 3 lines 3 
+times...
+    at <unknown> (https://nextjs.o
+rg/docs/messages/module-not-found)
+    at <unknown> (https://nextjs.o
+rg/docs/messages/module-not-found)

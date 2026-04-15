@@ -1,0 +1,69 @@
+# Drury 188-189 | Rated Best Cafe in London
+
+[DRURY 188-189](http://localhost:3010/)
+[Menu](http://localhost:3010/menu)
+[About](http://localhost:3010/about)
+[Locations](http://localhost:3010/locations)
+[Work](http://localhost:3010/work)
+[Journal](http://localhost:3010/journal)
+[Napkin Art](http://localhost:3010/napkin-art)
+[Visit Us](http://localhost:3010/visit)
+
+## Established 2016 · London
+
+# Welcome to Drury
+Rated Best Cafe in London & Covent Garden
+
+## The Signature Ritual
+"A journey in three acts."
+
+### TheBean
+WeexclusivelyserveAllpressEspresso,sourcedfromthemostvibranthigh-altituderegions.Everybeanisselectedforitsstoryanditssoul.
+
+### TheRoast
+Micro-batchroastingensuresthateverynoteoffruit,caramel,andearthispreserved.Aprecisioncraftthatdemandspatienceandobsession.
+
+### ThePour
+Ourlovelystaffaretrainedintheartoftheslowpour.Norushing,noshortcuts.JustaperfectlybalancedritualservedinourCoventGardensanctuary.
+
+## "We quit our 9-5 jobs to build a place where time slows down."
+Cemal and Ali founded Drury 188-189 with a simple vision: to create a sanctuary in the heart of London. A place where the coffee is obsessive, the staff are like family, and the Wi-Fi doesn't exist. Because the best conversations happen when you're truly present.
+[Our Full Story](http://localhost:3010/about)
+
+#### Baklava Pancakes
+
+## Artisan Curation, London Soul.
+At Drury 188-189, we believe in the beauty of the slow ritual. From our award-winning Allpress Espresso to our signature Mediterranean-inspired brunch, every plate is a tribute to quality and conversation.
+[Explore the Menu](http://localhost:3010/menu)
+
+## The Napkin Art Project.
+Our walls aren't covered in wallpaper; they're covered in your stories. Over the years, our guests have turned simple napkins into a vast gallery of shared vision, humor, and heart.
+[View the Gallery](http://localhost:3010/napkin-art)
+
+## Drury 188-189
+Crafting London's finest coffee ritual since Day Zero.
+
+### Navigation
+- [Our Story](http://localhost:3010/about)
+- [The Menu](http://localhost:3010/menu)
+- [Sanctuaries](http://localhost:3010/locations)
+- [The Journal](http://localhost:3010/journal)
+- [Hire & Events](http://localhost:3010/work)
+[Our Story](http://localhost:3010/about)
+[The Menu](http://localhost:3010/menu)
+[Sanctuaries](http://localhost:3010/locations)
+[The Journal](http://localhost:3010/journal)
+[Hire & Events](http://localhost:3010/work)
+
+### Connect
+- General Enquiries[info@drury188189.co.uk](mailto:info@drury188189.co.uk)
+- Telephone[020 7836 4381](tel:02078364381)
+- [Instagram](http://localhost:3010)[TikTok](http://localhost:3010)
+[info@drury188189.co.uk](mailto:info@drury188189.co.uk)
+[020 7836 4381](tel:02078364381)
+[Instagram](http://localhost:3010)
+[TikTok](http://localhost:3010)
+[PrivacyPrivacy](http://localhost:3010/privacy)
+[TermsTerms](http://localhost:3010/terms)
+
+# DRURY

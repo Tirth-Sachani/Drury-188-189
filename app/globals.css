@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@theme {
+  --color-napkin: #F5F0E8;
+  --color-oat-milk: #F2EAD8;
+  --color-roast: #1C1208;
+  --color-crema: #C8924A;
+  --color-void: #0A0705;
+  --color-off-white: #FDFCFB;
+
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+
+  --animate-marquee: marquee 120s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+:root {
+  --background: #F5F0E8;
+  --foreground: #1C1208;
+}
+
+/* Fluid Typography base */
+html {
+  font-size: clamp(0.875rem, 0.8rem + 0.375vw, 1.125rem);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--background);
+  color: var(--foreground);
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.serif {
+  font-family: var(--font-serif);
+}
+
+.monolith {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+/* Responsive Grid System (Mobile First) */
+.resp-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  .resp-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .resp-grid-4 {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Responsive Container */
+.fluid-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1rem, 5vw, 4rem);
+  padding-right: clamp(1rem, 5vw, 4rem);
+}
+
+/* Custom Sidebar styles for GSAP */
+.sidebar-link-wrap {
+  overflow: hidden;
+}
+
+.sidebar-link {
+  display: block;
+  transform: translateY(100%);
+  opacity: 0;
+}
