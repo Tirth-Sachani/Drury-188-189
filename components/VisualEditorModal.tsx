@@ -172,8 +172,8 @@ export function VisualEditorModal({ isOpen, onClose }: { isOpen: boolean; onClos
               cellThickness={0.5} 
               sectionSize={5} 
               sectionThickness={1.5} 
-              sectionColor={[0.78, 0.57, 0.29, 0.3]} // Hex to RGB matching #c8924a roughly
-              cellColor={[0.78, 0.57, 0.29, 0.1]} 
+              sectionColor="#c8924a"
+              cellColor="#4a3f35" 
               fadeDistance={25} 
               fadeStrength={1}
             />
