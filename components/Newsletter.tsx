@@ -1,12 +1,88 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, query, where, getDocs, serverTimestamp } from "firebase/firestore";
+import gsap from "gsap";
 
 const Newsletter = () => {
   const [hasMounted, setHasMounted] = useState(false);
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const messageRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Reset status
+    setStatus("loading");
+    setMessage("Joining the ritual...");
+
+    const emailTrimmed = email.trim().toLowerCase();
+
+    // Basic Validation
+    if (!emailTrimmed || !emailTrimmed.includes("@")) {
+      setStatus("error");
+      setMessage("Please enter a valid email.");
+      
+      // Error shake animation
+      if (formRef.current) {
+        gsap.to(formRef.current, {
+          x: [-10, 10, -10, 10, 0],
+          duration: 0.4,
+          ease: "power2.inOut"
+        });
+      }
+      return;
+    }
+
+    try {
+      // Prevent duplicate emails
+      const q = query(collection(db, "subscribers"), where("email", "==", emailTrimmed));
+      const existing = await getDocs(q);
+
+      if (!existing.empty) {
+        setStatus("error");
+        setMessage("You are already part of the ritual.");
+        return;
+      }
+
+      // Add to Firestore
+      await addDoc(collection(db, "subscribers"), {
+        email: emailTrimmed,
+        createdAt: serverTimestamp(),
+        status: "active"
+      });
+
+      setStatus("success");
+      setMessage("Welcome to the community.");
+      setEmail("");
+
+      // Success animation
+      if (messageRef.current) {
+        gsap.fromTo(messageRef.current, 
+          { opacity: 0, y: 10, scale: 0.95 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.7)" }
+        );
+      }
+
+      // Fade out input/button
+      if (formRef.current) {
+        gsap.to(formRef.current.querySelector("input"), { opacity: 0.3, pointerEvents: "none", duration: 0.5 });
+        gsap.to(formRef.current.querySelector("button"), { backgroundColor: "rgba(200, 146, 74, 0.4)", scale: 0.95, duration: 0.5 });
+      }
+
+    } catch (error) {
+      console.error("Subscription error:", error);
+      setStatus("error");
+      setMessage("Something went wrong. Please try again.");
+    }
+  };
 
   if (!hasMounted) return null;
 
@@ -39,23 +115,46 @@ const Newsletter = () => {
              </div>
           </div>
 
-          <form className="relative max-w-md mx-auto group" suppressHydrationWarning>
+          <form 
+            ref={formRef}
+            onSubmit={handleSubmit}
+            className="relative max-w-md mx-auto group" 
+            suppressHydrationWarning
+          >
             <input 
               type="email" 
-              placeholder="YOUR EMAIL" 
+              placeholder={status === "success" ? "THANK YOU" : "YOUR EMAIL"}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={status === "loading" || status === "success"}
               suppressHydrationWarning
               className="w-full bg-transparent border-b border-roast/40 py-8 monolith text-[12px] tracking-[0.5em] focus:outline-none focus:border-roast transition-all text-center uppercase text-roast placeholder:text-roast/20"
             />
             <button 
               suppressHydrationWarning
               type="submit"
-              className="mt-12 monolith text-[10px] tracking-[0.6em] uppercase text-napkin bg-roast px-16 py-6 rounded-full hover:bg-crema hover:text-roast transition-colors duration-300 shadow-xl"
+              disabled={status === "loading" || status === "success"}
+              className={`mt-12 monolith text-[10px] tracking-[0.6em] uppercase text-napkin bg-roast px-16 py-6 rounded-full hover:bg-crema hover:text-roast transition-all duration-300 shadow-xl ${status === "loading" ? "opacity-70 cursor-wait" : ""}`}
             >
-              Subscribe
+              {status === "loading" ? "Joining..." : status === "success" ? "Subscribed" : "Subscribe"}
             </button>
-            <p className="mt-12 monolith text-[8px] tracking-[0.3em] text-roast/30 uppercase italic font-light">
-              Trusted by 5,000+ Coffee Seekers
-            </p>
+            
+            {message && (
+              <p 
+                ref={messageRef}
+                className={`mt-12 monolith text-[10px] tracking-[0.3em] uppercase transition-colors ${
+                  status === "error" ? "text-red-500/80" : status === "success" ? "text-roast" : "text-roast/30"
+                }`}
+              >
+                {message}
+              </p>
+            )}
+
+            {status !== "success" && (
+              <p className="mt-8 monolith text-[8px] tracking-[0.3em] text-roast/30 uppercase italic font-light">
+                Trusted by 5,000+ Coffee Seekers
+              </p>
+            )}
           </form>
         </div>
       </div>
@@ -64,3 +163,4 @@ const Newsletter = () => {
 };
 
 export default Newsletter;
+

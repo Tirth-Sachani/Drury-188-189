@@ -85,11 +85,40 @@ The application uses a hybrid data architecture combining **Google Firebase Fire
 
 ---
 
+### 6. `subscribers`
+*Mailing list for the community newsletter.*
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | `string` | Document ID |
+| `email` | `string` | Subscriber email (unique) |
+| `status` | `enum` | `active`, `inactive` |
+| `createdAt` | `timestamp` | Time of subscription |
+
+---
+
+### 7. `inquiries`
+*Real-time inquiries from the Visit and Contact pages.*
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | `string` | Document ID |
+| `name` | `string` | Sender's full name |
+| `email` | `string` | Sender's email |
+| `phone` | `string` | Optional contact number |
+| `location` | `string` | Intent (e.g. "Covent Garden (Walk-in)") |
+| `date` | `string` | Planned visit date (ISO or null) |
+| `message` | `string` | Message content |
+| `status` | `enum` | `new`, `read`, `archived` |
+| `createdAt` | `timestamp` | Time of submission |
+
+---
+
 ## 💾 Local Persistence Keys
 - `drury_posts`
 - `drury_napkins`
 - `drury_menu`
 - `drury_artisans`
 - `drury_settings`
+- `drury_subscribers`
+- `drury_inquiries`
 - `drury_cart`
 - `drury_user`

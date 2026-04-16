@@ -1,16 +1,30 @@
 "use client";
-import React, { useRef, useLayoutEffect } from "react";
+import React, { useRef, useLayoutEffect, useState, useEffect } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { useStore } from "@/lib/store";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default function ContactPage() {
   const { settings } = useStore();
   const headerRef = useRef(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const successRef = useRef<HTMLDivElement>(null);
+  
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+  });
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      gsap.registerPlugin(ScrollTrigger);
+    }
+  }, []);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -24,6 +38,33 @@ export default function ContactPage() {
     }, headerRef);
     return () => ctx.revert();
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.message) return;
+
+    setStatus("loading");
+    try {
+      await addDoc(collection(db, "inquiries"), {
+        ...formData,
+        location: `Contact Support: ${formData.subject || "General"}`,
+        createdAt: serverTimestamp(),
+        status: "new"
+      });
+
+      setStatus("success");
+      
+      const tl = gsap.timeline();
+      tl.to(formRef.current, { opacity: 0, y: -20, duration: 0.5, pointerEvents: "none" });
+      tl.fromTo(successRef.current, 
+        { opacity: 0, scale: 0.9, display: "none" },
+        { opacity: 1, scale: 1, display: "block", duration: 0.8, ease: "back.out(1.7)" }
+      );
+    } catch (error) {
+      console.error("Contact error:", error);
+      setStatus("error");
+    }
+  };
 
   return (
     <main className="min-h-screen bg-napkin text-roast pb-0 pt-32 md:pt-40">
@@ -51,14 +92,39 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-24">
             
             {/* Left Column: Form */}
-            <div className="md:col-span-7 bg-[#FDFCFB] border border-roast/10 p-8 md:p-16 fade-up">
+            <div className="md:col-span-7 bg-[#FDFCFB] border border-roast/10 p-8 md:p-16 fade-up relative overflow-hidden">
               <h2 className="serif text-4xl mb-12">Send a Message</h2>
-              <form className="space-y-10" onSubmit={(e) => e.preventDefault()}>
+              
+              <div ref={successRef} className="hidden py-12 text-center">
+                <div className="w-16 h-16 bg-crema/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-roast"><path d="M20 6L9 17L4 12"/></svg>
+                </div>
+                <h3 className="serif text-3xl mb-4 italic">Message Received.</h3>
+                <p className="monolith text-[10px] uppercase tracking-widest opacity-60">We'll reach out to your ritual soon.</p>
+                <button 
+                  onClick={() => {
+                    setStatus("idle");
+                    setFormData({ name: "", email: "", subject: "", message: "" });
+                    gsap.to(successRef.current, { opacity: 0, duration: 0.3, onComplete: () => {
+                      gsap.set(successRef.current, { display: "none" });
+                      gsap.fromTo(formRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, pointerEvents: "all" });
+                    }});
+                  }}
+                  className="mt-10 monolith text-[9px] uppercase tracking-widest border-b border-roast/20 pb-1 hover:border-roast transition-all"
+                >
+                  Send another message
+                </button>
+              </div>
+
+              <form ref={formRef} className="space-y-10" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div>
                     <label className="monolith text-[10px] uppercase tracking-widest text-roast/60 mb-3 block">Name</label>
                     <input 
                       type="text" 
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
                       className="w-full bg-transparent border border-roast/10 focus:border-roast outline-none px-4 py-3 font-serif transition-colors" 
                     />
                   </div>
@@ -66,6 +132,9 @@ export default function ContactPage() {
                     <label className="monolith text-[10px] uppercase tracking-widest text-roast/60 mb-3 block">Email</label>
                     <input 
                       type="email" 
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
                       className="w-full bg-transparent border border-roast/10 focus:border-roast outline-none px-4 py-3 font-serif transition-colors" 
                     />
                   </div>
@@ -74,6 +143,8 @@ export default function ContactPage() {
                   <label className="monolith text-[10px] uppercase tracking-widest text-roast/60 mb-3 block">Subject</label>
                   <input 
                     type="text" 
+                    value={formData.subject}
+                    onChange={(e) => setFormData({...formData, subject: e.target.value})}
                     className="w-full bg-transparent border border-roast/10 focus:border-roast outline-none px-4 py-3 font-serif transition-colors" 
                   />
                 </div>
@@ -81,15 +152,22 @@ export default function ContactPage() {
                   <label className="monolith text-[10px] uppercase tracking-widest text-roast/60 mb-3 block">Message</label>
                   <textarea 
                     rows={6} 
+                    required
+                    value={formData.message}
+                    onChange={(e) => setFormData({...formData, message: e.target.value})}
                     className="w-full bg-transparent border border-roast/10 focus:border-roast outline-none px-4 py-3 font-serif resize-none transition-colors"
                   ></textarea>
                 </div>
                 <button 
                   type="submit" 
-                  className="bg-[#C8924A] text-white monolith text-[11px] uppercase tracking-[0.2em] px-10 py-5 hover:bg-roast transition-all mt-4 w-full md:w-auto"
+                  disabled={status === "loading"}
+                  className={`bg-[#C8924A] text-white monolith text-[11px] uppercase tracking-[0.2em] px-10 py-5 hover:bg-roast transition-all mt-4 w-full md:w-auto ${status === 'loading' ? 'opacity-70 cursor-wait' : ''}`}
                 >
-                  Send Message
+                  {status === "loading" ? "Sending..." : "Send Message"}
                 </button>
+                {status === "error" && (
+                   <p className="monolith text-[9px] uppercase tracking-widest text-red-500 mt-4">Something went wrong. Please try again.</p>
+                )}
               </form>
             </div>
 
