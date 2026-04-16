@@ -127,8 +127,8 @@ export default function SubscribersPage() {
         x: 50,
         duration: 0.4,
         ease: "power2.in",
-        onComplete: async () => {
-          await deleteDoc(docRef);
+        onComplete: () => {
+          deleteDoc(docRef);
         }
       });
     } catch (error) {

@@ -113,7 +113,17 @@ export default function VisitPage() {
     
     // Validation
     if (!formData.name || !formData.email || !formData.email.includes("@") || !formData.message) {
-      gsap.to(formRef.current, { x: [-10, 10, -10, 10, 0], duration: 0.4 });
+      gsap.to(formRef.current, { 
+        keyframes: {
+          "0%": { x: 0 },
+          "20%": { x: -10 },
+          "40%": { x: 10 },
+          "60%": { x: -10 },
+          "80%": { x: 10 },
+          "100%": { x: 0 }
+        },
+        duration: 0.4 
+      });
       return;
     }
 

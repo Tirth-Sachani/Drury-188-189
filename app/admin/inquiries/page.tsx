@@ -90,8 +90,8 @@ export default function InquiriesPage() {
         x: 50,
         duration: 0.4,
         ease: "power2.in",
-        onComplete: async () => {
-          await deleteDoc(doc(db, "inquiries", id));
+        onComplete: () => {
+          deleteDoc(doc(db, "inquiries", id));
           if (selectedInquiry?.id === id) setSelectedInquiry(null);
         }
       });
