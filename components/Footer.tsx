@@ -91,7 +91,8 @@ const Footer = () => {
                 { label: "The Menu", href: "/menu" },
                 { label: "Sanctuaries", href: "/locations" },
                 { label: "The Journal", href: "/journal" },
-                { label: "Hire & Events", href: "/work" }
+                { label: "Hire & Events", href: "/work" },
+                { label: "Contact", href: "/contact" }
               ].map((link, i) => (
                 <li key={i}>
                   <Link href={link.href} className="serif text-2xl text-roast hover:italic hover:pl-2 transition-all block">
