@@ -26,7 +26,15 @@ export default function JournalPage() {
 
   useEffect(() => {
     if (!mainRef.current) return;
+    
+    // Performance Optimization
+    ScrollTrigger.config({ limitCallbacks: true });
+    // Note: normalizeScroll removed — causes black screen on some browsers
+
     const ctx = gsap.context(() => {
+      // Force 3D to prevent flicker globally
+      gsap.set(".archive-card", { force3D: true });
+
       // 1. Hero Text Reveal Animation
       const heroChars = document.querySelectorAll(".hero-char");
       gsap.from(heroChars, {
@@ -47,46 +55,180 @@ export default function JournalPage() {
         delay: 0.8
       });
 
-      // 2. Layered Circular Reveal Section for Featured Posts
+      // 2. Option 3: Liquid Horizontal Drag Gallery with Velocity Skew
       if (horizontalRef.current && horizontalScrollRef.current) {
-        const panels = gsap.utils.toArray(".horizontal-panel") as HTMLElement[];
+        const track = horizontalScrollRef.current;
+        const cards = gsap.utils.toArray(".drag-card") as HTMLElement[];
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: horizontalRef.current,
-            pin: true,
-            scrub: 1,
-            start: "top top",
-            end: () => `+=${window.innerHeight * panels.length}`,
-            invalidateOnRefresh: true
-          }
-        });
+        if (cards.length > 0) {
+          // Set initial hidden state via GSAP (not inline style) so it's fully controlled
+          gsap.set(cards, { opacity: 0, y: 60 });
 
-        // Initialize panels overlapping
-        gsap.set(panels, { position: "absolute", top: 0, left: 0, width: "100%", height: "100%" });
-        // Hide all but the first using a tiny inset
-        gsap.set(panels.slice(1), { clipPath: "circle(0% at 50% 50%)" });
+          // Use RAF to defer measurement until AFTER the browser has fully painted the flex layout
+          const initHorizontal = () => {
+            ScrollTrigger.refresh();
+            const totalWidth = track.scrollWidth - window.innerWidth;
 
-        panels.forEach((panel, i) => {
-          if (i === 0) {
-            gsap.set(panel, { zIndex: 0 });
-            return;
-          }
-          gsap.set(panel, { zIndex: i });
+            if (totalWidth <= 0) return; // Layout not ready yet, skip
 
-          // Scale down and darken the previous panel
-          tl.to(panels[i - 1], {
-            scale: 0.95,
-            filter: "brightness(0.4)",
-            ease: "none"
-          }, "reveal" + i);
+            // Map vertical → horizontal
+            gsap.to(track, {
+              x: () => -(track.scrollWidth - window.innerWidth),
+              ease: "none",
+              scrollTrigger: {
+                trigger: horizontalRef.current,
+                pin: true,
+                scrub: 1.2,
+                start: "top top",
+                end: () => `+=${track.scrollWidth - window.innerWidth}`,
+                invalidateOnRefresh: true,
+                onUpdate: (self) => {
+                  const velocity = self.getVelocity() / 4000;
+                  const skew = gsap.utils.clamp(-15, 15, velocity * 18);
+                  cards.forEach((card) => {
+                    const inner = card.querySelector(".drag-card-inner") as HTMLElement;
+                    if (inner) {
+                      gsap.to(inner, {
+                        skewX: skew,
+                        scale: 1 + Math.abs(velocity) * 0.03,
+                        duration: 0.3,
+                        ease: "power2.out",
+                        overwrite: "auto",
+                      });
+                    }
+                  });
+                },
+              }
+            });
 
-          // Expand the circle to reveal the current panel
-          tl.to(panel, {
-            clipPath: "circle(150% at 50% 50%)",
-            ease: "power2.inOut"
-          }, "reveal" + i);
-        });
+            // Snap back on scroll stop
+            ScrollTrigger.addEventListener("scrollEnd", () => {
+              cards.forEach((card) => {
+                const inner = card.querySelector(".drag-card-inner") as HTMLElement;
+                if (inner) {
+                  gsap.to(inner, {
+                    skewX: 0, scale: 1,
+                    duration: 0.9,
+                    ease: "elastic.out(1, 0.35)",
+                    overwrite: "auto",
+                  });
+                }
+              });
+            });
+          };
+
+          // Stagger cards in first, THEN init horizontal scroll + RAIN animation
+          gsap.to(cards, {
+            opacity: 1, y: 0,
+            stagger: 0.1,
+            duration: 0.9,
+            ease: "power3.out",
+            delay: 0.2,
+            onComplete: () => {
+              initHorizontal();
+
+              // === RAIN DROP TITLE ANIMATION ===
+              cards.forEach((card, cardIdx) => {
+                const chars = card.querySelectorAll(".drag-title-char") as NodeListOf<HTMLElement>;
+                if (!chars.length) return;
+
+                // Set all chars invisible at top before rain starts
+                gsap.set(chars, { opacity: 0, y: -120, scaleY: 2.5, scaleX: 0.4, transformOrigin: "top center" });
+
+                chars.forEach((char, ci) => {
+                  // Random natural rain delay — not uniform, not too scattered
+                  const rainDelay = cardIdx * 0.3 + ci * 0.055 + Math.random() * 0.08;
+
+                  // Phase 1: FALL — fast drop with gravity feel
+                  gsap.to(char, {
+                    y: 0,
+                    scaleY: 1,
+                    scaleX: 1,
+                    opacity: 1,
+                    duration: 0.45,
+                    ease: "power3.in",  // Accelerate like gravity
+                    delay: rainDelay,
+                    onComplete: () => {
+                      // Phase 2: IMPACT BOUNCE — elastic snap at the landing point
+                      gsap.fromTo(char,
+                        { scaleY: 0.5, scaleX: 1.4 },  // Squash on impact
+                        {
+                          scaleY: 1,
+                          scaleX: 1,
+                          duration: 0.45,
+                          ease: "elastic.out(1.2, 0.4)",  // Bouncy rebound
+                        }
+                      );
+
+                      // Phase 3: After landing — subtle continuous drip ripple loop
+                      gsap.to(char, {
+                        y: 3,
+                        duration: 1.8 + ci * 0.035,
+                        repeat: -1,
+                        yoyo: true,
+                        ease: "sine.inOut",
+                        delay: 0.4 + ci * 0.04,
+                      });
+                    }
+                  });
+
+                  // Streak effect: a thin vertical blur as it falls
+                  gsap.to(char, {
+                    filter: "blur(0px)",
+                    duration: 0.45,
+                    delay: rainDelay,
+                    ease: "power2.in",
+                  });
+                  gsap.set(char, { filter: "blur(2px)" });
+                });
+
+                // Hover: raindrops scatter back up (reverse rain) then fall back down
+                const titleEl = card.querySelector(".drag-title");
+                if (titleEl) {
+                  titleEl.addEventListener("mouseenter", () => {
+                    chars.forEach((char, ci) => {
+                      gsap.to(char, {
+                        y: -(20 + Math.random() * 30),
+                        opacity: 0.4,
+                        color: "#c8924a",
+                        duration: 0.25 + Math.random() * 0.1,
+                        ease: "power2.out",
+                        delay: ci * 0.018,
+                        overwrite: "auto",
+                      });
+                    });
+                  });
+                  titleEl.addEventListener("mouseleave", () => {
+                    chars.forEach((char, ci) => {
+                      // Re-rain them back down
+                      gsap.to(char, {
+                        y: 0,
+                        opacity: 1,
+                        color: "",
+                        duration: 0.4,
+                        ease: "power3.in",
+                        delay: ci * 0.025,
+                        overwrite: "auto",
+                      });
+                    });
+                  });
+                }
+              });
+            },
+          });
+
+          // Label reveal
+          gsap.to(".drag-label", {
+            opacity: 1, y: 0, duration: 1, ease: "power2.out", delay: 0.1,
+          });
+
+          // Arrow hint pulse
+          gsap.to(".drag-hint-arrow", {
+            x: 10, repeat: -1, yoyo: true, duration: 0.9, ease: "sine.inOut", delay: 1.2,
+          });
+        } else {
+          gsap.to(".drag-label", { opacity: 1, duration: 0.8 });
+        }
       }
 
       // 3. Parallax Archive Cards
@@ -103,14 +245,16 @@ export default function JournalPage() {
             scrollTrigger: {
               trigger: card,
               start: "top 85%",
+              toggleActions: "play none none none",
+              once: true
             }
           }
         );
 
-        // Parallax image inside the card
-        const img = card.querySelector(".parallax-img");
-        if (img) {
-          gsap.to(img, {
+        // Parallax image inside the card (wrapper layer)
+        const wrapper = card.querySelector(".parallax-wrapper");
+        if (wrapper) {
+          gsap.to(wrapper, {
             y: "20%",
             ease: "none",
             scrollTrigger: {
@@ -172,34 +316,113 @@ export default function JournalPage() {
         </div>
       </header>
 
-      {/* Layered Reveal Featured Section */}
-      <section ref={horizontalRef} className="text-napkin relative w-full h-screen overflow-hidden hidden md:block">
-        <div className="absolute top-12 left-12 z-20">
-          <h2 className="monolith text-[10px] tracking-[0.3em] uppercase text-white/50">Featured Stories</h2>
+      {/* Option 3: Liquid Horizontal Drag Gallery */}
+      <section
+        ref={horizontalRef}
+        className="relative w-full overflow-hidden hidden md:block bg-void text-napkin"
+        style={{ height: "100vh" }}
+      >
+        {/* Top meta strip */}
+        <div className="drag-label absolute top-10 left-10 z-30 flex items-center gap-6 opacity-0">
+          <span className="monolith text-[9px] tracking-[0.4em] uppercase text-white/40">Featured Stories</span>
+          <span className="w-16 h-px bg-napkin/20"></span>
+          <span className="monolith text-[9px] tracking-[0.3em] uppercase text-crema/50">{FEATURED_POSTS.length} Articles</span>
         </div>
-        <div ref={horizontalScrollRef} className="relative h-full w-full">
+
+        {/* Scroll hint */}
+        <div className="absolute bottom-10 left-10 z-30 flex items-center gap-4">
+          <span className="monolith text-[8px] tracking-[0.3em] uppercase text-white/30">Scroll to explore</span>
+          <span className="drag-hint-arrow text-white/30 text-lg">→</span>
+        </div>
+
+        {/* Progress bar at bottom */}
+        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-napkin/10 z-20">
+          <div
+            className="drag-progress h-full bg-crema origin-left"
+            style={{ transform: "scaleX(0)" }}
+          />
+        </div>
+
+        {/* Horizontal track — GSAP translates this element */}
+        <div
+          ref={horizontalScrollRef}
+          className="flex h-full items-center will-change-transform"
+          style={{ width: "max-content", paddingLeft: "10vw", gap: "4vw", paddingRight: "15vw" }}
+        >
           {FEATURED_POSTS.map((post, i) => (
             <div
               key={i}
-              className={`horizontal-panel flex items-center justify-center p-12 lg:p-24 ${i % 2 === 0 ? 'bg-roast' : 'bg-void'}`}
+              className="drag-card flex-shrink-0 group cursor-pointer"
+              style={{ width: "clamp(300px, 34vw, 560px)" }}
             >
-              <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-12 items-center">
-                <div className="flex-1 w-full order-2 md:order-1">
-                  <div className="flex gap-4 items-center mb-6 opacity-60">
-                    <span className="monolith text-[10px] uppercase tracking-wider">{post.date}</span>
-                    <span className="w-1.5 h-1.5 bg-crema rounded-full"></span>
-                    <span className="monolith text-[10px] uppercase tracking-wider text-crema">{post.category}</span>
+              {/* Inner — receives GSAP skewX/scale on scroll velocity */}
+              <div
+                className="drag-card-inner relative"
+                style={{ willChange: "transform" }}
+              >
+                {/* Image block */}
+                <div
+                  className="relative overflow-hidden rounded-2xl"
+                  style={{ height: "clamp(320px, 55vh, 560px)" }}
+                >
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                    style={{ backgroundImage: `url('${post.image}')` }}
+                  />
+                  {/* Dark gradient bottom */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-void/80 via-void/10 to-transparent pointer-events-none" />
+
+                  {/* Category pill floating on image */}
+                  <div className="absolute top-5 left-5">
+                    <span className="monolith text-[8px] tracking-[0.3em] uppercase text-crema bg-void/60 backdrop-blur-sm py-1.5 px-3 rounded-full">
+                      {post.category}
+                    </span>
                   </div>
-                  <h3 className="serif text-5xl lg:text-7xl mb-8 leading-tight">{post.title}</h3>
-                  <p className="monolith text-[12px] opacity-70 leading-relaxed max-w-lg mb-12">{post.excerpt}</p>
-                  <Link href="/journal" className="inline-block monolith text-[10px] tracking-[0.2em] uppercase border border-napkin/20 py-4 px-8 rounded-full hover:bg-napkin hover:text-roast transition-all duration-300">
-                    Read Article
-                  </Link>
+
+                  {/* Index number */}
+                  <div className="absolute top-5 right-5">
+                    <span className="monolith text-[9px] tracking-widest text-white/30">0{i + 1}</span>
+                  </div>
+
+                  {/* Bottom caption inside image */}
+                  <div className="absolute bottom-5 left-5 right-5">
+                    <p className="monolith text-[8px] tracking-[0.2em] uppercase text-white/40">{post.date}</p>
+                  </div>
                 </div>
-                <div className="flex-1 w-full order-1 md:order-2">
-                  <div className="aspect-[4/5] bg-roast/50 rounded-2xl overflow-hidden relative group">
-                    <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" style={{ backgroundImage: `url('${post.image}')` }}></div>
-                  </div>
+
+                {/* Text below image */}
+                <div className="pt-6 pb-2">
+                  {/* Title with character split for GSAP animation */}
+                  <h3
+                    className="drag-title serif mb-3 leading-tight cursor-default select-none"
+                    style={{ fontSize: "clamp(1.4rem, 2.5vw, 2.2rem)", display: "flex", flexWrap: "wrap", gap: "0 0.05em" }}
+                  >
+                    {post.title.split("").map((char, ci) => (
+                      <span
+                        key={ci}
+                        className="drag-title-char inline-block"
+                        style={{
+                          whiteSpace: char === " " ? "pre" : "normal",
+                          display: "inline-block",
+                        }}
+                      >
+                        {char === " " ? "\u00A0" : char}
+                      </span>
+                    ))}
+                  </h3>
+                  <p className="monolith text-[10px] opacity-50 leading-relaxed mb-5"
+                    style={{ maxWidth: "42ch" }}>
+                    {post.excerpt}
+                  </p>
+
+                  {/* CTA — arrow style */}
+                  <Link
+                    href="/journal"
+                    className="inline-flex items-center gap-3 monolith text-[9px] tracking-[0.25em] uppercase group/lnk"
+                  >
+                    <span className="w-6 h-px bg-crema group-hover/lnk:w-12 transition-all duration-500"></span>
+                    <span className="text-crema group-hover/lnk:opacity-70 transition-opacity duration-300">Read Article</span>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -245,13 +468,15 @@ export default function JournalPage() {
               <Link
                 href="/journal"
                 key={i}
-                className={`archive-card group hover-read block ${i % 2 !== 0 ? 'md:mt-32' : ''}`}
+                className={`archive-card group hover-read block relative ${i % 2 !== 0 ? 'md:mt-32' : ''}`}
+                style={{ backfaceVisibility: "hidden", transformStyle: "preserve-3d", willChange: "transform", transform: "translateZ(0)" }}
               >
-                <div className="aspect-[4/5] bg-roast/5 overflow-hidden mb-8 rounded-2xl relative">
-                  {/* Parallax Container */}
-                  <div className="absolute top-[-20%] left-0 w-full h-[140%]">
+                <div className="aspect-[4/5] bg-roast/5 overflow-hidden mb-8 rounded-2xl relative journal-image-wrapper">
+                  {/* Parallax Container GSAP Layer */}
+                  <div className="parallax-wrapper absolute top-[-20%] left-0 w-full h-[140%]">
+                    {/* CSS Hover Scale Layer */}
                     <div
-                      className="parallax-img absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                      className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                       style={{ backgroundImage: `url('${post.image}')` }}
                     ></div>
                   </div>

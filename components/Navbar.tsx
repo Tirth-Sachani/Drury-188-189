@@ -1,31 +1,99 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
+import gsap from "gsap";
 
 const Navbar = () => {
   const { settings } = useStore();
-  const [isVisible, setIsVisible] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  
+  const navRef = useRef<HTMLElement>(null);
+  const lastScrollY = useRef(0);
+  const isNavbarHidden = useRef(false);
+  const ticking = useRef(false);
 
   useEffect(() => {
-    const handleScroll = () => {
+    const updateNavbar = () => {
       const currentScrollY = window.scrollY;
 
-      if (currentScrollY > lastScrollY && currentScrollY > 100 && !isMenuOpen) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
+      if (isMenuOpen) {
+        lastScrollY.current = currentScrollY;
+        ticking.current = false;
+        return;
       }
 
-      setLastScrollY(currentScrollY);
+      const diff = currentScrollY - lastScrollY.current;
+      const SCROLL_THRESHOLD = 8;
+      
+      // Ignore micro scrolls (THIS FIXES BLINKING)
+      if (Math.abs(diff) < SCROLL_THRESHOLD) {
+        ticking.current = false;
+        return;
+      }
+
+      // Scroll Down -> Hide
+      if (diff > 0 && currentScrollY > 100) {
+        if (!isNavbarHidden.current) {
+          gsap.killTweensOf(navRef.current);
+          gsap.to(navRef.current, {
+            yPercent: -150,
+            opacity: 0,
+            pointerEvents: "none",
+            duration: 0.4,
+            ease: "power2.out",
+            overwrite: "auto"
+          });
+          isNavbarHidden.current = true;
+        }
+      } 
+      // Scroll Up -> Show
+      else if (diff < 0) {
+        if (isNavbarHidden.current) {
+          gsap.killTweensOf(navRef.current);
+          gsap.to(navRef.current, {
+            yPercent: 0,
+            opacity: 1,
+            pointerEvents: "auto",
+            duration: 0.4,
+            ease: "power2.out",
+            overwrite: "auto"
+          });
+          isNavbarHidden.current = false;
+        }
+      }
+
+      lastScrollY.current = currentScrollY;
+      ticking.current = false;
     };
 
+    const handleScroll = () => {
+      if (!ticking.current) {
+        requestAnimationFrame(updateNavbar);
+        ticking.current = true;
+      }
+    };
+
+    lastScrollY.current = window.scrollY;
     window.addEventListener("scroll", handleScroll, { passive: true });
+    
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY, isMenuOpen]);
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    if (isMenuOpen && isNavbarHidden.current) {
+      gsap.to(navRef.current, {
+        yPercent: 0,
+        opacity: 1,
+        pointerEvents: "auto",
+        duration: 0.4,
+        ease: "power2.out",
+        overwrite: "auto"
+      });
+      isNavbarHidden.current = false;
+    }
+  }, [isMenuOpen]);
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -91,14 +159,14 @@ const Navbar = () => {
       </aside>
 
       {/* Main Navbar */}
-      <nav 
-        className={cn(
-          "fixed left-1/2 -translate-x-1/2 w-[92%] md:w-[90%] lg:w-[85%] max-w-6xl z-[100] top-6 rounded-full border border-white/10 px-6 py-3",
-          "bg-[rgba(20,20,20,0.7)] backdrop-blur-[10px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]",
-          "transition-all duration-300 ease-in-out",
-          isVisible ? "translate-y-0 opacity-100" : "-translate-y-[150%] opacity-0 pointer-events-none"
-        )}
-      >
+      <div className="fixed left-1/2 -translate-x-1/2 w-[92%] md:w-[90%] lg:w-[85%] max-w-6xl z-[100] top-6 pointer-events-none">
+        <nav 
+          ref={navRef}
+          className={cn(
+            "w-full rounded-full border border-white/10 px-6 py-3 pointer-events-auto",
+            "bg-[rgba(20,20,20,0.7)] backdrop-blur-[10px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          )}
+        >
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link 
@@ -151,7 +219,8 @@ const Navbar = () => {
             </button>
           </div>
         </div>
-      </nav>
+        </nav>
+      </div>
     </>
   );
 };

@@ -25,6 +25,8 @@ const SanctuaryJournal = () => {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top 80%",
+          toggleActions: "play none none none",
+          once: true
         },
         y: 30,
         opacity: 0,
@@ -39,6 +41,8 @@ const SanctuaryJournal = () => {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top 70%",
+          toggleActions: "play none none none",
+          once: true
         },
         scaleY: 0,
         transformOrigin: "top",
@@ -52,6 +56,8 @@ const SanctuaryJournal = () => {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top 75%",
+          toggleActions: "play none none none",
+          once: true
         },
         x: -20,
         opacity: 0,

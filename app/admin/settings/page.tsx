@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useStore, Settings } from "@/lib/store";
+import { VisualEditorModal } from "@/components/VisualEditorModal";
 
 export default function SettingsPage() {
   const { isInitialized, isAuthenticated, settings, updateSettings } = useStore();
   const [localSettings, setLocalSettings] = useState<Settings | null>(null);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   // Sync local state with store settings when they arrive
   useEffect(() => {
@@ -142,7 +144,11 @@ export default function SettingsPage() {
             <h3 style={{ marginBottom: "4px" }}>Floor Plan Manager</h3>
             <p style={{ color: "#7a7060", fontSize: "13px" }}>Visualize and manage your studio layout.</p>
           </div>
-          <button className="admin-btn-primary" style={{ padding: "8px 16px", fontSize: "11px" }}>
+          <button 
+            className="admin-btn-primary" 
+            style={{ padding: "8px 16px", fontSize: "11px" }}
+            onClick={() => setIsEditorOpen(true)}
+          >
             Launch Visual Editor
           </button>
         </div>
@@ -175,6 +181,8 @@ export default function SettingsPage() {
           <h1 style={{ fontSize: "18px" }}>Drury 188-189</h1>
         </div>
       </div>
+
+      <VisualEditorModal isOpen={isEditorOpen} onClose={() => setIsEditorOpen(false)} />
     </div>
   );
 }
