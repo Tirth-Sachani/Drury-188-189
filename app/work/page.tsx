@@ -8,17 +8,17 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const WorkSection = ({ 
-  title, 
+const WorkSection = ({
+  title,
   italicTitle,
-  description, 
-  features, 
-  price, 
-  image, 
+  description,
+  features,
+  price,
+  image,
   reversed,
   ctaText,
   ctaLink
-}: { 
+}: {
   title: string;
   italicTitle: string;
   description: string;
@@ -35,12 +35,12 @@ const WorkSection = ({
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       // Image Reveal
-      gsap.fromTo(imageRef.current, 
+      gsap.fromTo(imageRef.current,
         { clipPath: "inset(0% 0% 100% 0%)", scale: 1.2 },
-        { 
-          clipPath: "inset(0% 0% 0% 0%)", 
-          scale: 1, 
-          duration: 1.8, 
+        {
+          clipPath: "inset(0% 0% 0% 0%)",
+          scale: 1,
+          duration: 1.8,
           ease: "power4.inOut",
           scrollTrigger: {
             trigger: containerRef.current,
@@ -69,10 +69,10 @@ const WorkSection = ({
   return (
     <div ref={containerRef} className={cn("py-32 flex flex-col items-center gap-16 md:gap-24", reversed ? "md:flex-row-reverse" : "md:flex-row")}>
       <div className="w-full md:w-1/2 overflow-hidden rounded-3xl aspect-[4/5] relative group shadow-2xl">
-        <img 
+        <img
           ref={imageRef}
-          src={image} 
-          alt={title} 
+          src={image}
+          alt={title}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-roast/10 group-hover:bg-transparent transition-colors duration-1000" />
@@ -83,7 +83,7 @@ const WorkSection = ({
           {title} <span className="italic">{italicTitle}</span>
         </h2>
         <p className="monolith text-sm text-roast/60 leading-relaxed mb-12 max-w-sm work-reveal">{description}</p>
-        
+
         {price && (
           <div className="mb-12 p-8 bg-crema/10 border border-crema/20 rounded-2xl work-reveal">
             <div className="flex justify-between items-end mb-8 border-b border-roast/10 pb-6">
@@ -103,8 +103,8 @@ const WorkSection = ({
 
         {ctaText && (
           <div className="work-reveal pt-4">
-            <Link 
-              href={ctaLink || "#"} 
+            <Link
+              href={ctaLink || "#"}
               className="inline-block monolith text-[11px] tracking-[0.3em] uppercase px-14 py-5 bg-roast text-napkin hover:bg-crema hover:text-roast transition-all rounded-full font-bold shadow-xl"
             >
               {ctaText}
@@ -141,7 +141,7 @@ export default function WorkPage() {
 
   return (
     <main className="min-h-screen bg-napkin text-roast">
-      
+
       <header ref={headerRef} className="pt-60 pb-20 text-center md:text-left">
         <div className="container mx-auto px-6 max-w-6xl">
           <h1 className="serif text-7xl md:text-[10rem] italic border-b border-roast/5 pb-12 mb-12 leading-[0.9] work-title">Work & Events.</h1>
@@ -151,8 +151,8 @@ export default function WorkPage() {
 
       <section className="pb-40">
         <div className="container mx-auto px-6 max-w-6xl">
-          <WorkSection 
-            title="Co-working at" 
+          <WorkSection
+            title="Co-working at"
             italicTitle="Drury N4"
             description="Located in Woodberry Down, our N4 sanctuary offers a dedicated environment for deep work. A balance of natural light, reservoir views, and artisanal coffee to fuel your productivity."
             price="£17.50"
@@ -168,11 +168,11 @@ export default function WorkPage() {
             ctaLink="/contact"
           />
 
-          <WorkSection 
-            title="Private" 
+          <WorkSection
+            title="Private"
             italicTitle="Sanctuary Events"
             description="Our mezzanine area is an elegant, elevated space available for private hire. From strategic team meetings to intimate celebrations, we curate the perfect ritual for your guests."
-            image="https://images.unsplash.com/photo-1541167760496-162955ed8a9f?auto=format&fit=crop&q=80"
+            image="https://images.unsplash.com/photo-1658849110893-841726ccd937?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8d29yayUyMG9mZmljZSUyMHdpdGglMjBubyUyMHN0YWZmfGVufDB8MXwwfHx8MA%3D%3D"
             ctaText="Enquire Privately"
             ctaLink="mailto:info@drury188189.co.uk"
             reversed
