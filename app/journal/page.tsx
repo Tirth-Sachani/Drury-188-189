@@ -213,6 +213,59 @@ export default function JournalPage() {
                     });
                   });
                 }
+
+                // === EXCERPT & CTA ANIMATIONS ===
+                const excerpt = card.querySelector(".drag-excerpt");
+                const cta = card.querySelector(".drag-cta");
+
+                if (excerpt) {
+                  gsap.fromTo(excerpt,
+                    { opacity: 0, y: 20 },
+                    {
+                      opacity: 0.5,
+                      y: 0,
+                      duration: 0.8,
+                      ease: "power2.out",
+                      delay: 0.8 + cardIdx * 0.2,
+                    }
+                  );
+                }
+
+                if (cta) {
+                  gsap.fromTo(cta,
+                    { opacity: 0, x: -10 },
+                    {
+                      opacity: 1,
+                      x: 0,
+                      duration: 0.8,
+                      ease: "power2.out",
+                      delay: 1 + cardIdx * 0.2,
+                    }
+                  );
+
+                  // Magnetic hover effect for CTA
+                  cta.addEventListener("mousemove", (e: any) => {
+                    const rect = cta.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+
+                    gsap.to(cta, {
+                      x: x * 0.3,
+                      y: y * 0.3,
+                      duration: 0.4,
+                      ease: "power2.out",
+                    });
+                  });
+
+                  cta.addEventListener("mouseleave", () => {
+                    gsap.to(cta, {
+                      x: 0,
+                      y: 0,
+                      duration: 0.6,
+                      ease: "elastic.out(1, 0.3)",
+                    });
+                  });
+                }
               });
             },
           });
@@ -410,7 +463,7 @@ export default function JournalPage() {
                       </span>
                     ))}
                   </h3>
-                  <p className="monolith text-[10px] opacity-50 leading-relaxed mb-5"
+                  <p className="drag-excerpt monolith text-[10px] opacity-50 leading-relaxed mb-5"
                     style={{ maxWidth: "42ch" }}>
                     {post.excerpt}
                   </p>
@@ -418,7 +471,7 @@ export default function JournalPage() {
                   {/* CTA — arrow style */}
                   <Link
                     href="/journal"
-                    className="inline-flex items-center gap-3 monolith text-[9px] tracking-[0.25em] uppercase group/lnk"
+                    className="drag-cta inline-flex items-center gap-3 monolith text-[9px] tracking-[0.25em] uppercase group/lnk"
                   >
                     <span className="w-6 h-px bg-crema group-hover/lnk:w-12 transition-all duration-500"></span>
                     <span className="text-crema group-hover/lnk:opacity-70 transition-opacity duration-300">Read Article</span>
